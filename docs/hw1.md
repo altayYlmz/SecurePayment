@@ -64,4 +64,4 @@ This homework verifies SQL injection resistance in payment reference search and 
 ## 8. Contribution
 
 - **Mehmet Altay Yılmaz / 05240000940** — Developed the SecurePayment demo site and implemented the vulnerable payment reference search used to demonstrate SQL injection.
-- **Serhat Ere / 05230000999** — Implemented the parameterized-query fix and contributed to the development of the demo site.
+- **Serhat Er / 05230000999** — Implemented the parameterized-query fix and contributed to the development of the demo site.
