@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="tr">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sipariş tahsilatları · SecurePayment</title>
+<style>
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:#faf9f5;color:#272d28;font:16px/1.5 "Segoe UI",sans-serif}
+header{border-bottom:1px solid #c9ccc3;background:#eeefe7}
+.bar,main{max-width:980px;margin:auto;padding:0 24px}
+.bar{min-height:62px;display:flex;align-items:center;gap:14px}
+.brand{font:600 20px Georgia,serif;color:#254435}
+.environment{border-left:1px solid #aeb7a9;padding-left:14px;color:#49594c;font-size:13px}
+#exit{margin-left:auto}
+main{padding-top:42px;padding-bottom:60px}
+h1,h2{font-family:Georgia,serif;font-weight:normal;line-height:1.15}
+h1{font-size:clamp(36px,6vw,56px);letter-spacing:-.04em;margin:0 0 30px}
+h2{font-size:25px;margin:0 0 16px}
+section{padding:24px 0;border-top:1px solid #bfc5b9}
+form,.toolbar{display:flex;align-items:end;flex-wrap:wrap;gap:12px}
+label{display:grid;gap:5px;font-size:14px;font-weight:600}
+input,button{font:inherit;border:1px solid #929b90;border-radius:4px;padding:9px 12px}
+input{background:white;color:inherit;max-width:100%;min-width:0;font-size:16px}
+button{cursor:pointer;background:#faf9f5;color:#263c2e;font-weight:600}
+button:hover{background:#e5e9df}
+.primary{background:#284c3a;color:white;border-color:#284c3a}
+.primary:hover{background:#1b3c2c}
+:focus-visible{outline:3px solid #987738;outline-offset:2px}
+.grow{flex:1 1 240px}
+.hint,.empty{color:#586156;font-size:14px}
+#feedback{margin:0 0 16px;color:#314f3e}
+#feedback:empty{display:none}
+#feedback.error{color:#943e28}
+.toolbar{justify-content:space-between;align-items:center;margin-bottom:14px}
+.toolbar h2{margin:0}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{padding:12px 8px;border-bottom:1px solid #d7d9cf;text-align:left}
+th{font-size:13px;color:#545f54;background:#eff0e9}
+td:first-child{overflow-wrap:anywhere}
+th:nth-child(2),td:nth-child(2){text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td:last-child{text-align:right}
+td button{padding:4px 9px;font-size:14px}
+[inert]{opacity:.65}
+@media(max-width:580px){.bar,main{padding-left:16px;padding-right:16px}.toolbar form{width:100%}.toolbar input{width:100%}th,td{padding:10px 4px}table{min-width:410px}}
+.bar,main{max-width:1100px}
+body{background:#f6f5f0;color:#212c30}
+header{background:#20343b;border:0}
+.brand{color:#fff;font:600 20px "Segoe UI",sans-serif;letter-spacing:-.04em}
+.environment{color:#d7e2dc;border-color:#708185}
+h1{font-family:Georgia,serif;font-size:clamp(32px,5vw,48px)}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);border-block:1px solid #b6c0b8;margin:0 0 26px;background:#eaece4}
+.summary div{padding:16px 20px}
+.summary dt{font-size:13px;color:#44514c}
+.summary dd{margin:3px 0 0;font:500 clamp(19px,3vw,30px) Georgia,serif;font-variant-numeric:tabular-nums}
+#login{max-width:600px;background:white;padding:24px;border:1px solid #cbd1ca}
+.entry{background:white;padding:22px;border:1px solid #cbd1ca;margin-bottom:28px}
+dialog{border:1px solid #aab4ac;border-radius:4px;padding:28px;width:min(420px,92vw);color:#20343b}
+dialog::backdrop{background:#182b3480}
+dialog dl{display:grid;grid-template-columns:auto 1fr;gap:12px;margin:22px 0}
+dialog dd{margin:0;text-align:right;overflow-wrap:anywhere}
+.receipt{font:600 14px monospace;color:#244c54;border:0;background:transparent;text-decoration:underline;text-underline-offset:3px}
+.catalog{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;width:100%}
+.product{background:#f6f5f0;border:1px solid #d7d9cf;padding:16px}
+.product h3{margin:0;font-size:16px}
+.product p{margin:4px 0 12px}
+.product label{grid-template-columns:auto 72px;align-items:center;justify-content:space-between}
+.cart-total{margin-right:auto;font-size:16px}
+.receipt{max-width:100%;overflow-wrap:anywhere;text-align:left}
+@media(max-width:580px){.summary div{padding:10px}.summary dt{font-size:12px}.entry{padding:14px}}
+</style>
+<header><div class="bar"><strong class="brand">SecurePayment</strong><span class="environment">Test ortamı</span><span class="environment" id="account-label" hidden></span><button id="exit" hidden>Çıkış</button></div></header>
+<main>
+<h1 id="page-title">SecurePayment</h1>
+<p id="feedback" role="status" aria-live="polite"></p>
+<section id="login"><h2>Hesaba giriş</h2><p>Alışverişe veya mağaza paneline erişmek için hesap anahtarınızı girin.</p>
+<form id="signin"><label class="grow">Erişim anahtarı<input id="key" type="password" required autocomplete="off" spellcheck="false"></label><button class="primary">Bağlan</button></form>
+<p class="hint">Hesap oluştururken verilen anahtarı gir. İlk kullanımda proje klasöründe <code>python app.py add-user hesap-adi</code> komutuyla bir hesap açabilirsin.</p></section>
+<div id="desk" hidden>
+<dl class="summary" id="store-summary" aria-label="Mağaza toplamları" hidden><div><dt>Bekleyen tahsilat</dt><dd id="pending"></dd></div><div><dt>Net tahsilat</dt><dd id="net"></dd></div><div><dt>İade toplamı</dt><dd id="returned"></dd></div></dl>
+<section class="entry" id="shop" hidden><h2>Kırtasiye kataloğu</h2><form id="create">
+<div id="catalog" class="catalog"></div>
+<strong id="cart-total" class="cart-total"></strong>
+<button id="checkout" class="primary" disabled>Siparişi oluştur</button></form></section>
+<section><div class="toolbar"><h2 id="list-title">Siparişler</h2><form id="filter"><label>Referansla ara<input id="search" type="search" maxlength="80" placeholder="Tam referans"></label><button>Ara</button><button id="all" type="button" hidden>Tümü</button><button id="refresh" type="button">Yenile</button></form></div>
+<div class="scroll"><table><thead><tr><th>Referans</th><th>Tutar</th><th>Durum</th><th id="action-heading" aria-label="İşlem" hidden></th></tr></thead><tbody id="rows"></tbody></table></div><p id="empty" class="empty"></p></section>
+</div></main>
+<dialog id="detail" aria-labelledby="detail-title"><h2 id="detail-title">İşlem ayrıntısı</h2><dl id="receipt-data"></dl><form method="dialog"><button>Kapat</button></form></dialog>
+<script>
+const el = id => document.getElementById(id);
+const stages = {
+  created: ['Provizyon bekliyor', 'Provizyon al', 'authorize'],
+  authorized: ['Provizyon alındı', 'Tahsil et', 'simulate'],
+  paid: ['Tahsil edildi', 'İade et', 'refund'],
+  refunded: ['İade edildi']
+};
+const money = new Intl.NumberFormat('tr-TR', {style:'currency', currency:'TRY'});
+let token = '';
+let isStore = false;
+let activeFilter = '';
+let catalog = [];
+let checkoutId = null;
+
+function showCatalog(products) {
+  catalog = products;
+  el('catalog').replaceChildren();
+  for (const product of catalog) {
+    const card = document.createElement('article');
+    card.className = 'product';
+    const name = document.createElement('h3');
+    name.textContent = product.name;
+    const description = document.createElement('p');
+    description.className = 'hint';
+    description.textContent = product.description;
+    const quantity = document.createElement('input');
+    quantity.type = 'number';
+    quantity.min = 0;
+    quantity.max = 20;
+    quantity.value = quantity.defaultValue = '0';
+    quantity.id = 'qty-' + product.sku;
+    quantity.setAttribute('aria-label', product.name + ' adedi');
+    quantity.oninput = () => { checkoutId = null; updateCart(); };
+    const price = document.createElement('label');
+    price.append(money.format(product.unit_minor / 100), quantity);
+    card.append(name, description, price);
+    el('catalog').append(card);
+  }
+  updateCart();
+}
+
+function updateCart() {
+  const total = catalog.reduce((subtotal, product) =>
+    subtotal + product.unit_minor * Number(el('qty-' + product.sku).value), 0);
+  el('cart-total').textContent = 'Sepet toplamı · ' + money.format(total / 100);
+  el('checkout').disabled = total === 0;
+}
+function message(text, error = false) {
+  el('feedback').textContent = text;
+  el('feedback').classList.toggle('error', error);
+}
+function disconnect() {
+  token = activeFilter = '';
+  isStore = false;
+  checkoutId = null;
+  for (const id of ['signin','filter','create']) el(id).reset();
+  el('rows').replaceChildren();
+  el('desk').hidden = el('exit').hidden = el('account-label').hidden = true;
+  el('account-label').textContent = '';
+  el('page-title').textContent = 'SecurePayment';
+  el('login').hidden = false;
+}
+async function request(path, method = 'GET', data) {
+  const headers = {Authorization: 'Bearer ' + token};
+  if (data) headers['Content-Type'] = 'application/json';
+  const response = await fetch(path, {method, headers, body: JSON.stringify(data)});
+  if (response.status === 401) {
+    disconnect();
+    throw Error('Erişim anahtarı geçersiz. Anahtarı kontrol edip yeniden bağlan.');
+  }
+  const result = await response.json();
+  if (!response.ok) {
+    if (response.status === 409) throw Error(data ? 'Bu referans başka bir tutarla kullanılmış.' : 'İşlemin durumu değişmiş. Listeyi tekrar getir.');
+    throw Error(result.error || 'İstek tamamlanamadı.');
+  }
+  return {result, status:response.status};
+}
+async function run(task) {
+  if (document.querySelector('main').inert) return;
+  const main = document.querySelector('main');
+  main.inert = el('exit').disabled = true;
+  message('');
+  try { await task(); }
+  catch (error) { message(error instanceof TypeError ? 'Sunucuya ulaşılamadı. Bağlantıyı kontrol et.' : error.message, true); }
+  finally { main.inert = el('exit').disabled = false; }
+}
+async function list(reference) {
+  const query = reference ? '?' + new URLSearchParams({reference}) : '';
+  const {result} = await request('/payments' + query);
+  if (!reference && isStore) {
+    const totals = {pending:0, net:0, returned:0};
+    for (const payment of result) {
+      const group = {created:'pending', authorized:'pending', paid:'net', refunded:'returned'}[payment.status];
+      totals[group] += payment.amount_minor;
+    }
+    for (const [id, minor] of Object.entries(totals)) el(id).textContent = money.format(minor / 100);
+  }
+  activeFilter = reference;
+  el('all').hidden = !reference;
+  el('rows').replaceChildren();
+  el('empty').textContent = result.length ? '' : reference ? 'Bu referansa ait işlem bulunamadı.' : 'Henüz ödeme kaydı yok.';
+  for (const payment of result) {
+    const row = el('rows').insertRow();
+    const [status, label, action] = stages[payment.status];
+    const referenceButton = document.createElement('button');
+    referenceButton.className = 'receipt';
+    referenceButton.textContent = payment.reference;
+    referenceButton.onclick = () => run(async () => {
+      const {result: detail} = await request('/payments/' + payment.id);
+      const fields = {'Sipariş referansı':detail.reference, 'İşlem numarası':detail.id,
+        'Sipariş hesabı':detail.owner, 'Tutar':money.format(detail.amount_minor / 100),
+        'Durum':stages[detail.status][0]};
+      if (detail.items) fields['Ürünler'] = detail.items.map(item =>
+        item.quantity + ' × ' + item.name + ' (' + money.format(item.unit_minor / 100) + ')').join('\n');
+      const details = el('receipt-data');
+      details.replaceChildren();
+      for (const [name, value] of Object.entries(fields)) {
+        const term = document.createElement('dt');
+        const description = document.createElement('dd');
+        term.textContent = name;
+        description.textContent = value;
+        description.style.whiteSpace = 'pre-line';
+        details.append(term, description);
+      }
+      el('detail').showModal();
+    });
+    row.insertCell().append(referenceButton);
+    for (const value of [money.format(payment.amount_minor / 100), status]) row.insertCell().textContent = value;
+    if (!isStore) continue;
+    const cell = row.insertCell();
+    if (!action) continue;
+    const button = document.createElement('button');
+    button.textContent = label;
+    button.onclick = () => run(async () => {
+      if (action === 'refund' && !confirm(payment.reference + ' için ' + money.format(payment.amount_minor / 100) + ' iade edilsin mi?')) return;
+      const {result} = await request('/payments/' + payment.id + '/' + action, 'POST');
+      const previousFilter = activeFilter;
+      await list('');
+      if (previousFilter) await list(previousFilter);
+      message(payment.reference + ' · ' + stages[result.status][0]);
+    });
+    cell.append(button);
+  }
+}
+function onSubmit(id, task) {
+  el(id).onsubmit = event => { event.preventDefault(); run(task); };
+}
+onSubmit('signin', async () => {
+  token = el('key').value.trim();
+  const {result: session} = await request('/session');
+  isStore = session.role === 'store';
+  if (!isStore) {
+    const {result: products} = await request('/catalog');
+    showCatalog(products);
+  }
+  await list('');
+  el('page-title').textContent = isStore ? 'Mağaza paneli' : 'Kırtasiye mağazası';
+  el('list-title').textContent = isStore ? 'Tahsilat işlemleri' : 'Siparişlerim';
+  el('account-label').textContent = session.name;
+  el('account-label').hidden = false;
+  el('shop').hidden = isStore;
+  el('store-summary').hidden = el('action-heading').hidden = !isStore;
+  el('key').value = '';
+  el('login').hidden = true;
+  el('desk').hidden = el('exit').hidden = false;
+});
+onSubmit('create', async () => {
+  const quantities = {};
+  for (const product of catalog) {
+    const quantity = Number(el('qty-' + product.sku).value);
+    if (quantity > 0) quantities[product.sku] = quantity;
+  }
+  checkoutId ??= crypto.randomUUID().replaceAll('-', '');
+  const {result} = await request('/orders', 'POST', {checkout_id: checkoutId, quantities});
+  await list('');
+  el('filter').reset();
+  el('create').reset();
+  checkoutId = null;
+  updateCart();
+  message(result.reference + ' numaralı sipariş oluşturuldu.');
+});
+onSubmit('filter', () => list(el('search').value.trim()));
+el('all').onclick = () => run(async () => { await list(''); el('filter').reset(); });
+el('refresh').onclick = () => run(() => list(activeFilter));
+el('exit').onclick = () => { disconnect(); message('Oturum kapatıldı.'); };
+</script>
+</html>

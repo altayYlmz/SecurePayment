@@ -1,6 +1,6 @@
 # SecurePayment
 
-T3 Secure Payment Access is a local REST API for simulated TRY payments. Each sandbox account can create, authorize, settle, search and refund its own payments. Amounts are integer kuruş. The server determines the owner and status. A payment reference is unique per account, so retrying creation with the same reference and amount returns the original payment.
+T3 Secure Payment Access is a local REST API for simulated TRY payments. Customers place orders and track their own payments. Staff of the demo store share the checkout queue and can authorize, settle and refund payments. Amounts are integer kuruş.
 
 ## Run on Windows
 
@@ -10,10 +10,23 @@ Use Python 3.10 or newer. In PowerShell, from this directory:
 python app.py serve
 ```
 
-In a second PowerShell window in the same directory, create a demo account once and keep the token in that window:
+Create one account for each role in another terminal. Use new account names if these already exist.
 
 ```powershell
-$token = python app.py add-user demo
+python app.py add-user musteri-demo
+python app.py add-user magaza-demo --role store
+```
+
+Open http://127.0.0.1:8000 in two browser tabs. Enter the customer key in one tab and the store key in the other. Existing keys open customer accounts.
+Choose quantities from the stationery catalog and submit the cart as the customer. The server calculates the total and assigns the reference.
+Use **Yenile** on the store screen to see and process the order. The customer can refresh **Siparişlerim** to see its current status.
+Select a reference to view the original order items.
+Refreshing the page or choosing **Çıkış** clears the token from the page.
+
+The store account can also create a manual payment through the API. Create a separate store account for this example:
+
+```powershell
+$token = python app.py add-user api-magaza-demo --role store
 $headers = @{Authorization = "Bearer $token"}
 $base = "http://127.0.0.1:8000/payments"
 $body = @{reference="demo-001"; amount_minor=2590; currency="TRY"} | ConvertTo-Json
@@ -24,4 +37,4 @@ Invoke-RestMethod "${base}?reference=demo-001" -Headers $headers
 Invoke-RestMethod "$base/$($payment.id)/refund" -Method Post -Headers $headers
 ```
 
-The example simulates ₺25.90 and then refunds it. The reference filter performs an exact, parameterized lookup scoped to the authenticated account. Run `python -m unittest -v` for the integration checks. Tests use a temporary database.
+The example simulates ₺25.90 and then refunds it. The payment list supports searching by reference and restricts records according to the signed-in account. Run `python -m unittest -v` for the integration checks. Security regression tests are in `tests/security` and use a temporary database.
