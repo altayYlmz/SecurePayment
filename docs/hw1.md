@@ -8,7 +8,7 @@ The vulnerable feature is the payment reference search used from the normal paym
 sql = f"SELECT * FROM payments WHERE {visible} AND reference='{reference}'"
 ```
 
-The vulnerable statement is in `dispatch()` in `app.py` at the `hw1-vulnerable` tag. Record the exact line number after tagging with `git show hw1-vulnerable:app.py`.
+The vulnerable statement is in `dispatch()` in `app.py` at line 159 of the `hw1-vulnerable` tag.
 
 ## 2. Attacker
 

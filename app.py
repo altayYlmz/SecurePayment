@@ -154,10 +154,8 @@ def dispatch(db, env):
         if not query:
             rows = db.execute(f"SELECT * FROM payments WHERE {visible} ORDER BY rowid DESC", scope)
         elif set(query) == {"reference"} and len(query["reference"]) == 1:
-            # Intentionally vulnerable for the SQL injection assignment demo.
-            reference = query["reference"][0]
-            sql = f"SELECT * FROM payments WHERE {visible} AND reference='{reference}'"
-            rows = db.execute(sql, scope)
+            rows = db.execute(f"SELECT * FROM payments WHERE {visible} AND reference=?",
+                              (*scope, query["reference"][0]))
         else:
             raise ApiError(400, "Expected a single reference filter")
         return 200, [dict(row) for row in rows]
