@@ -14,7 +14,7 @@ The vulnerable statement is in `dispatch()` in `app.py` at line 159 of the `hw1-
 
 The attacker is an authenticated customer of the demo payment system. They want the reference-search feature to return payment records belonging to another customer. The attacker can submit a reference through the ordinary search interface and inspect the returned records.
 
-Pairing-post threat description: **[PASTE THE PAIR'S THREE-SENTENCE DESCRIPTION HERE]**.
+Our registered system simulates a payment service where customers can view and track their own payment records. We consider an authenticated customer a potential attacker who can submit crafted input through normal features such as payment reference search. The attacker's goal is to access another customer's payment information, including references, amounts, and status.
 
 ## 3. Exploit
 
@@ -63,5 +63,5 @@ This homework verifies SQL injection resistance in payment reference search and 
 
 ## 8. Contribution
 
-- **[PARTNER 1 NAME / STUDENT NUMBER]** — [describe actual work performed].
-- **[PARTNER 2 NAME / STUDENT NUMBER]** — [describe actual work performed].
+- **Mehmet Altay Yılmaz / 05240000940** — Developed the SecurePayment demo site and implemented the vulnerable payment reference search used to demonstrate SQL injection.
+- **Serhat Ere / 05230000999** — Implemented the parameterized-query fix and contributed to the development of the demo site.
