@@ -55,7 +55,7 @@ The reference is therefore treated as a literal value, and the account visibilit
 
 The automated test in `tests/security/hw1_reference_search.py` uses a temporary SQLite database and two synthetic customers. It submits the injection payload as customer A and asserts that it returns no rows because it is not a real reference. The same test fails on `hw1-vulnerable`, which returns the seeded records, and passes on `hw1-fixed`.
 
-The GitHub Actions workflow at `.github/workflows/security.yml` runs the application tests and security tests. Fixed-tag CI run: **[ADD THE GREEN GITHUB ACTIONS RUN LINK AFTER PUSHING]**.
+The GitHub Actions workflow at `.github/workflows/security.yml` runs the application tests and security tests. Fixed-tag CI run: **[Successful hw1-fixed GitHub Actions run](https://github.com/altayYlmz/SecurePayment/actions/runs/45661304435)**.
 
 ## 7. Residual risk
 
